@@ -1,0 +1,30 @@
+#
+# How to setting replication slave server
+#
+
+1. Check master slave bin-log name and posision
+
+  db_master$ mysql -u root -e 'show master status'
+
++------------------+----------+------------------+------------------+
+| File             | Position | Binlog_Do_DB     | Binlog_Ignore_DB |
++------------------+----------+------------------+------------------+
+| mysql-bin.00000X | 0000000Y | hoge_db          |                  |
++------------------+----------+------------------+------------------+
+
+
+2. Execute "change master to" statement at slave server
+
+  db_slave$ mysql -u root -e 'change master to master_host="db master host name", master_user="replication user", master_password="replication user's password", master_log_file="mysql-bin.00000X", master_log_pos=Y'
+
+3. Start slave server
+
+  db_slave$ mysql -u root -e 'start slave'
+
+4. Check slave server status
+
+  db_salve$ mysql -u root -e 'show slave status ¥G'
+
+
+That's it!
+

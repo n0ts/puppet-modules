@@ -1,0 +1,18 @@
+#
+# How to install mailman
+#
+
+1. $ sudo /usr/lib/mailman/bin/newlist mailman
+2. $ sudo -u mailman /usr/lib/mailman/bin/gemaliases
+3. $ sudo g+w /etc/mailman/aliases.db
+
+   $ ls -l /etc/mailman 
+   total 44
+   -rw-r----- 1 root    mailman    41 Jun 30 01:19 adm.pw
+   -rw-rw---- 1 mailman mailman  3331 Jun 30 01:40 aliases
+   -rw-rw---- 1 mailman mailman 12288 Jun 30 01:40 aliases.db
+   lrwxrwxrwx 1 root    mailman    34 Jun 30 00:53 mm_cfg.py -> /usr/lib/mailman/Mailman/mm_cfg.py
+   -rwxrwsr-x 1 root    mailman  2343 Jun 30 00:52 mm_cfg.pyc*
+   -rwxrwsr-x 1 root    mailman  2343 Jun 30 00:52 mm_cfg.pyo*
+   -rw-r--r-- 1 root    mailman 14114 Jun 30 00:51 sitelist.cfg
+

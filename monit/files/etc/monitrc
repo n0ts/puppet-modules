@@ -1,0 +1,12 @@
+#
+# monit configuration
+#
+
+set daemon  60
+
+set logfile /var/log/monit
+
+set mailserver localhost
+
+ 
+include /etc/monit.d/*
