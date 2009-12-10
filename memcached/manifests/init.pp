@@ -7,6 +7,9 @@ class memcached {
     if $memcached_port == "" {
         $memcached_port = "11211"
     }
+    if $memcached_user == "" {
+        $memcached_user = "nobody"
+    }
     if $memcached_cachesize == "" {
         $memcached_cachesize = "512"
     }
