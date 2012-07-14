@@ -1,0 +1,5 @@
+# User to run lsyncd as. Requires read access to all of the local source path.
+# Using an account other than root is a good idea, but you'll need to change
+# ownership of the pid and log directories, or change them here
+USER=<%= lsyncd_user %>
+OPTIONS="-pidfile <%= lsyncd_pid_file %> -logfile <%= lsyncd_log_file %> <%= lsyncd_conf_file %>"

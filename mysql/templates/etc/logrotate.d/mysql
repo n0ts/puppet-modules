@@ -1,0 +1,27 @@
+<%- if mysql_slowlog == "" -%>
+<%= mysql_log %> {
+<%- else -%>
+<%= mysql_log %> <%= mysql_slowlog %> {
+<%- end -%>
+    create 600 mysql mysql
+    notifempty
+    daily
+    rotate 7
+    missingok
+    compress
+    sharedscripts
+    <%- if mysql_logrotate_slowlog_mailto != "" -%>
+    prerotate
+        /usr/bin/mysqldumpslow -s t <%= mysql_slowlog %> 2>/dev/null | \
+        mail -s "[mysqld] slowlog" <%= mysql_logrotate_slowlog_mailto %>
+    endscript
+    <%- end -%>
+    postrotate
+        # just if mysqld is really running
+        if test -x /usr/bin/mysqladmin && \
+            /usr/bin/mysqladmin ping &>/dev/null
+        then
+            /usr/bin/mysqladmin flush-logs
+        fi
+    endscript
+}

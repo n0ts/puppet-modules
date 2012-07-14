@@ -1,0 +1,10 @@
+#
+# rpm_dev puppet module
+#
+
+This module rpm_dev abstract.
+
+Usage:
+
+Variables:
+

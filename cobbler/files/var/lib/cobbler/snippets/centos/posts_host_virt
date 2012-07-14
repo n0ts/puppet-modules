@@ -1,0 +1,11 @@
+##
+# delete default bridge
+##
+/usr/bin/virsh net-destroy default
+/usr/bin/virsh net-autostart default --disable
+
+
+##
+# virt service
+##
+/sbin/service libvirtd start

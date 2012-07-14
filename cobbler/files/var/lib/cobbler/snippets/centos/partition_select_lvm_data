@@ -1,0 +1,16 @@
+# Determine how many drives we have
+set \$(list-harddrives)
+let numd=\$#/2
+d1=\$1
+d2=\$3
+
+cat << EOF >> /tmp/partinfo
+part /boot --fstype=ext3 --size=100        --ondisk=\$1 --asprimary
+part pv.01               --size=1   --grow --ondisk=\$1 --asprimary
+
+## LVM
+volgroup vg pv.01
+logvol /     --fstype=$fstype --name=root --vgname=vg --size=$disk_size --fsoptions="$fsoptions"
+logvol /data --fstype=$fstype --name=data --vgname=vg --size=1 --grow   --fsoptions="noatime,data=writeback"
+logvol swap  --fstype=swap   - -name=swap --vgname=vg --size=\$swap_size
+EOF

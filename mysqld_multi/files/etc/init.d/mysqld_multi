@@ -1,0 +1,157 @@
+#!/bin/bash
+#
+# mysqld_multi	This shell script takes care of starting and stopping
+#		the MySQL subsystem (mysqld_multi).
+#
+# chkconfig: - 64 36
+# description:	MySQL database server.
+# processname: mysqld_multi
+# config: /etc/my.cnf
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+
+prog="mysqld_multi"
+MYSQLD_MULTI="/usr/bin/mysqld_multi"
+GNR=
+
+if [ ! -x $MYSQLD_MULTI ]; then
+    echo "Could not found mysqld_multi - $MYSQLD_MULTI"
+    exit 1
+fi
+
+[ -f /etc/sysconfig/mysqld_multi ] && /etc/sysconfig/mysqld_multi
+
+
+# extract value of a MySQL option from /etc/my.cnf
+# Usage: get_mysql_option FILE VARNAME DEFAULT
+# result is returned in $result
+# Ugly as this is, it knows nothing of option file sections ...
+get_mysql_options(){
+    result=`sed -n "s/^[ \t]*$2[ \t]*=[ \t]*//p" "$1" 2>/dev/null`
+    if [ -z "$result" ]; then
+            # not found, use default
+        result="$3"
+    else
+            # found, still have to deal with quoting and end-of-line comments
+        dequoted=`echo "$result" | sed "s/^'\([^']*\)'.*$/\1/"`
+        if [ x"$dequoted" != x"$result" ]; then
+            result="$dequoted"
+        else
+            dequoted=`echo "$result" | sed 's/^"\([^"]*\)".*$/\1/'`
+            if [ x"$dequoted" != x"$result" ]; then
+                result="$dequoted"
+            else
+                result=`echo "$result" | sed 's/^\([^ \t#]*\).*$/\1/'`
+            fi
+        fi
+    fi 
+}
+
+
+get_mysql_options /etc/my.cnf datadir "/var/lib/mysql"
+datadirs="$result"
+get_mysql_options /etc/my.cnf log "/var/log/mysqld.log"
+logs="$result"
+get_mysql_options /etc/my.cnf log-error "/var/log/mysqld.log"
+errlogfiles="$result"
+get_mysql_options /etc/my.cnf pid-file "/var/log/mysqld.log"
+pids="$result"
+
+
+start(){
+    if [ ! -f /etc/my.cnf ]; then
+        echo "Could not find mysqld configuration file."
+        return -1
+    fi
+
+    for log in $logs
+    do
+        touch "$log"
+        chown mysql:mysql "$log"
+        chmod 0640 "$log"
+    done
+
+    for errlogfile in $errorlogfiles
+    do
+        touch "$errlogfile"
+        chown mysql:mysql "$errlogfile" 
+        chmod 0640 "$errlogfile"
+    done
+
+    for datadir in $datadirs
+    do
+        if [ ! -d "$datadir" ]; then
+            mkdir "$datadir"
+            chown -R mysql:mysql "$datadir"
+            chmod 0755 "$datadir"
+        fi
+
+        if [ ! -d "$datadir/mysql" ] ; then
+            action $"Initializing MySQL database: " /usr/bin/mysql_install_db
+            ret=$?
+            chown -R mysql:mysql "$datadir"
+            if [ $ret -ne 0 ] ; then
+                return $ret
+            fi
+        fi
+
+        chown -R mysql:mysql "$datadir"
+        chmod 0755 "$datadir"
+    done
+
+    action $"Starting $prog: " $MYSQLD_MULTI start
+    ret=$?
+    [ $ret -eq 0 ] && touch /var/lock/subsys/mysqld_multi
+    return $ret
+}
+
+stop(){
+    action $"Stopping $prog: " $MYSQLD_MULTI stop
+    rm -f /var/lock/subsys/mysqld_multi
+    return $ret
+}
+
+restart(){
+    stop
+    sleep 10
+    start
+}
+
+condrestart(){
+    [ -e /var/lock/subsys/mysqld_multi ] && restart || :
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        for pid in $pids
+        do
+            status -p $pid mysqld
+        done
+        ;;
+    report) 
+        $MYSQLD_MULTI report
+        ;;
+    restart)
+        restart
+        ;;
+    condrestart)
+        condrestart
+        ;;
+    *)
+    echo $"Usage: $0 {start|stop|report|restart|condrestart}"
+    exit 1
+esac
+
+exit $?

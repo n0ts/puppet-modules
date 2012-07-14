@@ -1,0 +1,15 @@
+DEFAULT menu
+PROMPT 0
+MENU TITLE <%= fqdn %> | <%= domain %>
+TIMEOUT 0
+TOTALTIMEOUT 0
+ONTIMEOUT local
+
+LABEL local
+        MENU LABEL (local)
+        MENU DEFAULT
+        LOCALBOOT 0
+
+$pxe_menu_items
+
+MENU end

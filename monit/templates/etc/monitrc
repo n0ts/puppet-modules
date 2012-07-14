@@ -1,0 +1,12 @@
+#
+# monit configuration
+#
+
+set daemon <%= monit_daemon %>
+
+set logfile <%= monit_logfile %>
+
+set mailserver <%= monit_mailserver %>
+
+
+include /etc/monit.d/*

@@ -1,0 +1,10 @@
+#
+# kvm puppet module
+#
+
+This module kvm abstract.
+
+Usage:
+
+Variables:
+

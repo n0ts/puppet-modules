@@ -1,0 +1,6 @@
+#!/bin/sh
+test -f /etc/sysconfig/lsyncd && . /etc/sysconfig/lsyncd
+
+exec 2>&1
+exec setuidgid <%= lsyncd_user %> \
+    /usr/bin/lsyncd -nodaemon $OPTIONS

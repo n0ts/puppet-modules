@@ -1,0 +1,13 @@
+#!/bin/sh
+
+function delete_log()
+{
+    find $1 -name "*_log.*" -type f -mtime +<%= httpd_delete_log_mtime %>  -exec rm -f {} \;
+}
+
+<% httpd_delete_log_dirs.collect!{|v| "\"#{v}\"" } -%>
+DIRS=(<%= httpd_delete_log_dirs.join(' ') %>)
+d=0
+for d in ${DIRS[@]}; do
+    delete_log $d
+done

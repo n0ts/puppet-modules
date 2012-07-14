@@ -1,0 +1,36 @@
+##
+# ssh
+##
+/usr/bin/patch /etc/ssh/sshd_config << EOF
+39c39
+< #PermitRootLogin yes
+---
+> PermitRootLogin no
+60c60
+< PasswordAuthentication yes
+---
+> PasswordAuthentication no
+73,74c73,74
+< #GSSAPIAuthentication no
+< GSSAPIAuthentication yes
+---
+> GSSAPIAuthentication no
+> #GSSAPIAuthentication yes
+76c76
+< GSSAPICleanupCredentials yes
+---
+> GSSAPICleanupCredentials no
+86,87c86,87
+< #UsePAM no
+< UsePAM yes
+---
+> UsePAM no
+> #UsePAM yes
+95,96c95,96
+< #X11Forwarding no
+< X11Forwarding yes
+---
+> X11Forwarding no
+> #X11Forwarding yes
+EOF
+

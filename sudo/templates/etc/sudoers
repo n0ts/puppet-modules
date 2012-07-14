@@ -1,0 +1,6 @@
+Defaults timestamp_timeout = 0
+Defaults passprompt = "%u@%h Password: "
+
+User_Alias          ADMIN = <%= sudo_user_alias %>
+ADMIN               ALL = (ALL) ALL, !/bin/su
+

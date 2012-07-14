@@ -1,0 +1,10 @@
+#
+# sysctl puppet module
+#
+
+This module sysctl abstract.
+
+Usage:
+
+Variables:
+

@@ -1,0 +1,10 @@
+#
+# iptables puppet module
+#
+
+This module iptables abstract.
+
+Usage:
+
+Variables:
+

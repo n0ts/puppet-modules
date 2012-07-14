@@ -1,0 +1,86 @@
+#!/bin/sh
+
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+STATE_DEPENDENT=4
+
+#
+# Check storage pdisk battery status.
+# Use omreport program.
+#
+
+OMREPORT="/opt/dell/srvadmin/oma/bin/omreport"
+
+if [ ! -x $OMREPORT ]; then
+    echo "Could not found $OMREPORT"
+    exit $STATE_WARNING
+fi
+
+
+STATUS=`$OMREPORT storage battery`
+STATUS_NEXT_ID=1
+STATUS_NEXT_STATUS=0
+STATUS_NEXT_NAME=0
+STATUS_NEXT_STATE=0
+
+while read status
+do
+    # check "ID" line
+    if [ $STATUS_NEXT_ID == 1 ]; then
+        LAST_ID=`echo $status | egrep "^ID"`
+        if [ -n "$LAST_ID" ]; then
+            STATUS_NEXT_ID=0
+            STATUS_NEXT_STATUS=1
+            continue
+        fi
+    fi
+
+    # check "Status" line
+    if [ $STATUS_NEXT_STATUS == 1 ]; then
+        LAST_STATUS=`echo $status | egrep "^Status"`
+        if [ -n "$LAST_STATUS" ]; then
+            STATUS_NEXT_STATUS=0
+            STATUS_NEXT_NAME=1
+            LAST_STATUS_RESULT=`echo "$LAST_STATUS" | tr -d ' ' | cut -d ":" -f 2`
+            continue
+        fi
+    fi
+
+    # check "Name" line
+    if [ $STATUS_NEXT_NAME == 1 ]; then
+        LAST_NAME=`echo $status | egrep "^Name"`
+        if [ -n "$LAST_NAME" ]; then
+            STATUS_NEXT_NAME=0
+            STATUS_NEXT_STATE=1
+            continue
+        fi
+    fi
+
+    # check "State" line
+    if [ $STATUS_NEXT_STATE == 1 ]; then
+        LAST_STATE=`echo $status | egrep "^State"`
+        if [ -n "$LAST_STATE" ]; then
+            # check RAID status
+            if [ "$LAST_STATUS_RESULT" != "Ok" ]; then
+                echo "---"
+                echo "$LAST_ID"
+                echo "$LAST_STATUS"
+                echo "$LAST_NAME"
+                echo "$LAST_STATE"
+                echo "---"
+                exit $STATE_CRITICAL
+            fi
+
+            STATUS_NEXT_STATE=0
+            STATUS_NEXT_ID=1
+        fi
+    fi
+done << END
+$STATUS
+END
+
+echo "${STATUS}"
+exit $STATE_OK
+

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+exec setuidgid <%= lsyncd_user %> \
+     multilog t s1000000 n30 \
+         <%= lsyncd_log_dir %>

@@ -1,0 +1,29 @@
+### files to exclude from "cobbler import" commands that use
+### rsync mirrors.  by default ISOs, PPC code, and debug
+### RPM's are not transferred.  Some users may want to
+### re-enable debug RPM's.
+**/debug/**
+**/alpha/**
+**/source/**
+**/SRPMS/**
+**/*.iso
+**/kde-i18n**
+pool/**/*.dsc
+pool/**/*.gz
+**/.*
+**/*debuginfo*
+**/*.i386.rpm
+**/*.ia64.rpm
+**/*.rhel3.*.rpm
+**/*.rhel4.*.rpm
+**/*.sles*.*.rpm
+**/*.dmg
+**/*.dmg.*
+**/*.gz
+**/*.gz.*
+**/*.msi
+**/*.msi.*
+**/*.pkg
+**/*.pkg.*
+**/*.zip
+**/*.zip.*

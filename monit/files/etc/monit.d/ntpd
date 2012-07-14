@@ -1,0 +1,8 @@
+#
+# ntpd
+#
+
+check process ntpd with pidfile /var/run/ntpd.pid
+      start program = "/etc/init.d/ntpd start"
+      stop program = "/etc/init.d/ntpd stop"
+      if failed port 123 type udp then restart

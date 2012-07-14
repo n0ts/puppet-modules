@@ -1,0 +1,33 @@
+@base
+@core
+
+## additional base package
+postfix
+sudo
+sysstat
+zsh
+
+## xfs only
+#if $fstype == "xfs"
+kmod-xfs
+xfsdump
+xfsprogs
+#end if
+
+#if $virt_host_type != ""
+koan
+libvirt
+python-virtinst
+#if $virt_host_type == "xen"
+xen
+#else if $virt_host_type == "kvm"
+kmod-kvm
+kvm
+qemu
+#end if
+#end if
+
+
+
+## exclude 32bit package
+-*.i386

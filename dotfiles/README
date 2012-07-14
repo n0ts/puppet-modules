@@ -1,0 +1,10 @@
+#
+# dotfiles puppet module
+#
+
+This module dotfiles abstract.
+
+Usage:
+
+Variables:
+

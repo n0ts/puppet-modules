@@ -1,0 +1,10 @@
+#
+# syslog puppet module
+#
+
+This module syslog abstract.
+
+Usage:
+
+Variables:
+

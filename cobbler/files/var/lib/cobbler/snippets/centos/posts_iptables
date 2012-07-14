@@ -1,0 +1,29 @@
+##
+# iptables
+##
+/bin/rm /etc/sysconfig/iptables
+# overwrite
+/bin/cat << EOF > /etc/sysconfig/iptables
+*filter
+:INPUT DROP [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -p icmp -j ACCEPT
+#set ikeys = $interfaces.keys()
+#for $iname in $ikeys
+  #if $iname == "eth0" or $iname == "bond0"
+    #set $idata        = $interfaces[$iname]
+    #set $iface_type   = $idata.get("interface_type", "").lower()
+    #set $iface_master = $idata.get("interface_master", "")
+    #if $iface_type == "bridge_slave" and $iface_master != ""
+      #set $iname = "br0"
+    #end if
+-A INPUT -i $iname -j ACCEPT
+  #end if
+#end for
+-A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+COMMIT
+EOF
+/bin/chmod 600 /etc/sysconfig/iptables

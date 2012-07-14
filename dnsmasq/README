@@ -1,0 +1,10 @@
+#
+# dnsmasq puppet module
+#
+
+This module dnsmasq abstract.
+
+Usage:
+
+Variables:
+

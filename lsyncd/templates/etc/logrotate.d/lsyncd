@@ -1,0 +1,7 @@
+<%= lsyncd_log_file %> {
+    missingok
+    notifempty
+    daily
+    compress
+    # The lsyncd daemon reopens the log file for each write, no script needed
+}

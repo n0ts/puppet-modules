@@ -1,0 +1,7 @@
+#
+# rsyslog
+#
+
+check process rsyslogd with pidfile /var/run/syslogd.pid
+   start program = "/etc/init.d/rsyslog start"
+   stop program = "/etc/init.d/rsyslog stop"

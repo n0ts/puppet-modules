@@ -1,0 +1,20 @@
+# Determine how many drives we have
+set \$(list-harddrives)
+let numd=\$#/2
+d1=\$1
+d2=\$3
+
+#set $raid_mode = $getVar('$raid_mode', '1')
+# Software RAID $raid_mode + LVM
+cat << EOF >> /tmp/partinfo
+part raid.1 --size=100        --ondisk=\$d1 --asprimary
+part raid.2 --size=100        --ondisk=\$d2 --asprimary
+part raid.3 --size=1   --grow --ondisk=\$d1
+part raid.4 --size=1   --grow --ondisk=\$d2
+raid /boot --fstype=ext3 --level=RAID1 --device=md0 raid.1 raid.2
+raid pv.01 --fstype="physical volume (LVM)" --level=RAID$raid_mode --device=md1 raid.3 raid.4
+
+volgroup vg pv.01
+logvol /    --fstype=$fstype --name=root --vgname=vg --size=$disk_size --fsoptions="$fsoptions"
+logvol swap --fstype=swap    --name=swap --vgname=vg --size=\$swap_size
+EOF

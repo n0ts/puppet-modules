@@ -1,0 +1,14 @@
+$TTL    86400
+@               IN SOA  @       root (  
+                                        104             ; serial (d. adams)
+                                        3H              ; refresh
+                                        15M             ; retry
+                                        1W              ; expiry
+                                        1D )            ; minimum
+
+                IN NS           ns1.<%= domain %>.
+
+$GENERATE   1-254   $.0.<%= name %>.in-addr.arpa.  PTR     s$.<%= domain %>.
+<% 3.times do |i| -%>
+$GENERATE   1-254   <%= i + 1 %>.$.<%= name %>.in-addr.arpa.  PTR     s$-u<%= i + 1 %>.<%= domain %>.
+<% end -%>

@@ -1,0 +1,8 @@
+#!/bin/sh
+DEVICE="$1"
+case "$DEVICE" in
+  lo)
+    /sbin/ip rule add prio 100 fwmark 1 table 100
+    /sbin/ip route add local 0/0 dev lo table 100
+    ;;
+esac

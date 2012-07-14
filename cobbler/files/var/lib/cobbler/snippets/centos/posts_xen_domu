@@ -1,0 +1,15 @@
+##
+# grub.conf
+##
+# delete console=
+/sbin/grubby --update-kernel=`/sbin/grubby --default-kernel` --remove-args="console="
+$SNIPPET('post_install_kernel_options')
+
+/usr/bin/patch /boot/grub/grub.conf << EOF
+12,13c12,13
+< splashimage=(hd0,0)/grub/splash.xpm.gz
+< hiddenmenu
+---
+> #splashimage=(hd0,0)/grub/splash.xpm.gz
+> #hiddenmenu
+EOF

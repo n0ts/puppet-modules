@@ -1,0 +1,194 @@
+##
+# path
+##
+/usr/bin/patch /etc/profile << EOF
+#raw
+23c23
+< if [ "\\$EUID" = "0" ]; then
+---
+> #if [ "\\$EUID" = "0" ]; then
+27c27
+< fi
+---
+> #fi
+#end raw
+EOF
+
+
+##
+# file descriptor
+##
+/usr/bin/patch /etc/security/limits.conf << EOF
+49a50,52
+> *               soft    nofile       65535
+> *               hard    nofile       65535
+> 
+EOF
+
+
+##
+# network
+##
+/bin/cat << EOF >> /etc/sysconfig/network
+NOZEROCONF=yes
+EOF
+
+
+##
+# services
+##
+#set disable_services = [ 
+"acpid",
+"auditd",
+"autofs",
+"avahi-daemon",
+"bluetooth",
+"firstboot",
+"gpm",
+"hidd",
+"iscsi",
+"iscsid",
+"ip6tables",
+"mcstrans",
+"mdmonitor",
+"netfs",
+"nfslock",
+"pcscd",
+"portmap",
+"restorecond",
+"rpcgssd",
+"rpcidmapd",
+"sendmail",
+"yum-updatesd",
+]
+#for $service in $disable_services
+/sbin/chkconfig $service off
+#end for
+
+
+## Virtual server only
+#if $virt_guest_type != ''
+/sbin/chkconfig smartd off
+  #if $virt_cpus == 1
+/sbin/chkconfig irqbalance off
+  #end if
+#end if
+
+
+##
+# disable ctrl+atl+del
+##
+#if $virt_host_type != ''
+/usr/bin/patch /etc/inittab << EOF
+32c32,33
+< ca::ctrlaltdel:/sbin/shutdown -t3 -r now
+---
+> #ca::ctrlaltdel:/sbin/shutdown -t3 -r now
+> ca::ctrlaltdel:/usr/bin/logger 'CTRL-ALT-DELETE trap is disabled'
+EOF
+#end if
+
+
+##
+# io scheduler
+##
+# FIXME
+#set $io_scheduler = $getVar('io_scheduler', '')
+#if $io_scheduler != ''
+/bin/cp /boot/grub/grub.conf /boot/grub/grub.conf.ev-orig
+/bin/sed -e '/.*kernel \/vmlinuz-[0-9].*$/s/$/ elevator=$io_scheduler/' /boot/grub/grub.conf.ev-orig > /boot/grub/grub.conf
+#end if
+
+
+##
+# redirect console (physical server or kvm host/guest)
+# for CentOS 5.x only
+##
+#if $virt_host_type != "xen" and $virt_guest_type != "xen"
+#import re
+#set $serial_port_re = $re.compile("ttyS([0-9])")
+#set $serial_port_re_match = $serial_port_re.match($serial_port)
+#if $serial_port_re_match
+#set $serial_port_unit = $serial_port_re_match.group(1)
+#else
+#set $serial_port_unit = 0
+#end if
+
+/bin/cat << EOF >> /etc/inittab
+
+# Console Redirection via Serial Port
+s0:12345:respawn:/sbin/agetty -L $baud_rate $serial_port vt102
+EOF
+
+/bin/cat << EOF >> /etc/securetty
+$serial_port
+EOF
+#end if
+
+
+##
+# /etc/sysctl.conf
+##
+## memory overcommit
+#set $sysctl_vm_overcommit_memory = $getVar('$sysctl_vm_overcommit_memory', '2')
+/bin/cat << EOF >> /etc/sysctl.conf
+
+# Disable OOM Killer
+vm.overcommit_ratio = 99
+vm.overcommit_memory = $sysctl_vm_overcommit_memory
+EOF
+
+
+##
+# login.defs
+##
+/bin/cat << EOF >> /etc/login.defs
+
+SU_WHEEL_ONLY yes
+EOF
+
+
+##
+# su
+##
+/usr/bin/patch /etc/pam.d/su << EOF
+6c6
+< #auth		required	pam_wheel.so use_uid
+---
+> auth		required	pam_wheel.so use_uid
+EOF
+
+
+##
+# sudo
+##
+#if $user_name != ''
+/usr/bin/passwd -l root
+
+# overwrite /etc/sudoers
+/bin/cat << EOF > /etc/sudoers
+Defaults timestamp_timeout = 0
+Defaults passprompt = "%u@%h Password: "
+
+User_Alias          ADMIN = root, $user_name
+ADMIN               ALL = (ALL) ALL, !/bin/su
+EOF
+#end if
+
+
+##
+# rc.local
+##
+#if $virt_guest_type == ''
+/bin/cat << EOF >> /etc/rc.local
+
+/usr/bin/setterm -foreground green -background black -blank 0 -powersave off -powerdown 0 -store < /dev/tty0 > /dev/tty0 2>&1
+EOF
+#end if
+
+#if $virt_num > 0
+/bin/cat << EOF >> /etc/rc.local
+
+EOF
+#end if
+

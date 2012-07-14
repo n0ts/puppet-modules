@@ -1,0 +1,14 @@
+##
+# post script for server vendor
+##
+#raw
+VENDOR=`/usr/sbin/dmidecode -s system-manufacturer 2> /dev/null`
+
+# Dell Inc.
+if [ "$VENDOR" = "Dell Inc." ]; then
+/usr/bin/yum --disableexcludes=all install -y compat-libstdc++-33.i386
+elif [ "$VENDOR" = "HP" ]; then
+/usr/bin/yum --disableexcludes=all install -y libstdc++.i386
+fi
+
+#end raw

@@ -1,0 +1,23 @@
+#set $root_device = '/dev/sda2'
+#set $data_device = ''
+#if $partition.find('lvm') != -1
+  #set $root_device = '/dev/mapper/vg-root'
+  #if $partition.find('_data') != -1
+    #set $data_device = '/dev/mapper/vg-data'
+  #end if
+#end if
+
+#if $fstype == 'ext3'
+  #set $tunefs = '/sbin/tune2fs'
+#else if $fstype == 'ext4'
+  #set $tunefs = '/sbin/tune4fs'
+#else
+  #set $tunefs = ''
+#end if
+
+#if $tunefs != ''
+$tunefs -c 0 -i 0 -m 1 $root_device
+  #if $data_device != ''
+$tunefs -c 0 -i 0 -m 1 $data_device
+  #end if
+#end if

@@ -1,0 +1,10 @@
+#
+# activemq puppet module
+#
+
+This module activemq abstract.
+
+Usage:
+
+Variables:
+

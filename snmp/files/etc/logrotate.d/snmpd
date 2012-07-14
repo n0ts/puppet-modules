@@ -1,0 +1,7 @@
+/var/log/snmpd.log {
+    notifempty
+    missingok
+    postrotate
+        /sbin/service snmpd condrestart 2> /dev/null > /dev/null || true
+    endscript
+}

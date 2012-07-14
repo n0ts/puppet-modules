@@ -1,0 +1,3 @@
+# snmpd command line options
+# OPTIONS="-Lsd -Lf /dev/null -p /var/run/snmpd.pid -a"
+OPTIONS="-Ls<%= snmp_log_facility %>d -Lf /dev/null -p /var/run/snmpd.pid"

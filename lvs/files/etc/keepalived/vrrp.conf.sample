@@ -1,0 +1,51 @@
+vrrp_sync_group VG {
+  group {
+    VI
+    VE
+  }
+
+  notify_master /etc/keepalived/vrrp_master.sh
+  notify_backup /etc/keepalived/vrrp_backup.sh
+  notify_fault  /etc/keepalived/vrrp_backup.sh
+  notify        /etc/keepalived/vrrp_state.sh
+}
+
+vrrp_instance VI {
+  state BACKUP
+  interface eth0
+  lvs_sync_daemon_interface eth1
+  garp_master_delay 5
+  virtual_router_id 1
+  priority 100
+  nopreempt
+  advert_int 1
+  smtp_alert
+  authentication {
+    auth_type PASS
+    auth_pass password
+  }
+  virtual_ipaddress {
+    # VIP for internal servers
+    #127.0.0.1/24 dev eth0
+  }
+}
+
+vrrp_instance VE {
+  state BACKUP
+  interface eth1
+  garp_master_delay 5
+  virtual_router_id 2
+  priority 100
+  nopreempt
+  advert_int 1
+  smtp_alert
+  authentication {
+    auth_type PASS
+    auth_pass password
+  }
+  virtual_ipaddress {
+    # VIP for external servers
+    #127.0.0.1/24 dev eth1
+  }
+}
+

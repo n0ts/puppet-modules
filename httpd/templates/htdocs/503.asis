@@ -1,0 +1,4 @@
+Status: 503 Service Unavailable
+Content-Type: text/plain
+
+<%= hostname %>

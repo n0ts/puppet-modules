@@ -1,0 +1,11 @@
+##
+# Physical server only
+##
+#if $virt_guest_type == ''
+/usr/bin/patch /boot/grub/grub.conf << EOF
+13c13
+< terminal --timeout=5 serial console
+---
+> terminal --timeout=5 console serial
+EOF
+#end if

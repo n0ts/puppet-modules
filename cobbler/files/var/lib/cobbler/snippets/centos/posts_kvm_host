@@ -1,0 +1,16 @@
+##
+# disable netfilter
+##
+/bin/cat << EOF >> /etc/sysctl.conf
+
+# Disable Netfilter processing in the bridged traffic
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+EOF
+
+
+##
+# load kvm module 
+##
+/sbin/modprobe kvm_intel

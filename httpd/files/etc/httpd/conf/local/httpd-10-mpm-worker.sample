@@ -1,0 +1,10 @@
+<IfModule mpm_worker_module>
+    StartServers           2
+    ServerLimit            4
+    ThreadLimit          256
+    ThreadsPerChild      256
+    MaxClients          1024
+    MinSpareThreads       25
+    MaxSpareThreads       75
+    MaxRequestsPerChild    0
+</IfModule>

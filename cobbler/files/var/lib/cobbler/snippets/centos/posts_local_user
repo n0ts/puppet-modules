@@ -1,0 +1,30 @@
+#if $group_name != "wheel"
+/usr/sbin/groupadd $group_name
+#end if
+
+#if $user_name != ''
+$SNIPPET($user_name + '/userpw')
+/bin/mkdir ~$user_name/.ssh
+/bin/chmod 700 ~$user_name/.ssh
+#set ssh_id_rsa = '/home/' + $user_name + '/.ssh/id_rsa'
+/bin/cat << EOF > ~$user_name/.ssh/id_rsa
+#include $ssh_id_rsa
+EOF
+/bin/chmod 600 ~$user_name/.ssh/id_rsa
+#set ssh_id_rsa_pub = '/home/' + $user_name + '/.ssh/id_rsa.pub'
+/bin/cat << EOF > ~$user_name/.ssh/id_rsa.pub
+#include $ssh_id_rsa_pub
+EOF
+/bin/chmod 600 ~$user_name/.ssh/id_rsa.pub
+/bin/cat << EOF > ~$user_name/.ssh/authorized_keys
+#include $ssh_id_rsa_pub
+EOF
+/bin/cat << EOF > ~$user_name/.ssh/config
+Host *
+  Compression yes
+  StrictHostKeyChecking no
+  LogLevel QUIET
+EOF
+/bin/chmod 600 ~$user_name/.ssh/authorized_keys
+/bin/chown -R $user_name:$group_name ~$user_name/.ssh
+#end if

@@ -1,0 +1,10 @@
+#
+# rsyslog puppet module
+#
+
+This module rsyslog abstract.
+
+Usage:
+
+Variables:
+

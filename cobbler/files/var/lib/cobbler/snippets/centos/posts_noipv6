@@ -1,0 +1,20 @@
+##
+# disable ipv6
+##
+#for $n in $kernel_options.split(' ')
+  #if $n == "noipv6"
+/usr/bin/patch /etc/sysconfig/network << EOF
+2c2
+< NETWORKING_IPV6=yes
+---
+> NETWORKING_IPV6=no
+EOF
+
+/bin/cat << EOF >> /etc/modprobe.conf
+options ipv6 disable=1
+alias net-pf-10 off
+EOF
+
+/sbin/chkconfig ip6tables off
+  #end if
+#end for

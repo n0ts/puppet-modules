@@ -1,0 +1,53 @@
+#raw
+#!/bin/sh
+# Exit if anything goes wrong
+set -e
+
+# First arg is operation.
+OP=$1
+shift
+
+script=/etc/xen/scripts/network-bridge
+
+exec_operation()
+{ 
+  sysconfig=/etc/sysconfig/network-scripts
+  if [ ! -d $sysconfig ]; then
+    return 1
+  fi
+
+  ETH_LIST=`ls $sysconfig/ifcfg-eth*`
+
+  num=0
+  for eth in $ETH_LIST
+  do
+    if [ $eth == "lo" ]; then
+      continue
+    fi
+
+    netdev=`cat $eth | egrep "DEVICE\=.*" | cut -d "=" -f 2`
+    $script $1 vifnum=$num bridge=xenbr$num netdev=$netdev
+
+    num=1
+  done
+}
+
+case ${OP} in
+  start)
+    exec_operation $OP
+    ;;
+
+  stop)
+    exec_operation $OP
+    ;;
+
+  status)
+    exec_operation $OP
+    ;;
+
+  *)
+    echo 'Unknown command: ' ${OP}
+    echo 'Valid command are: start, stop, status'
+    exit 1
+esac
+#end raw

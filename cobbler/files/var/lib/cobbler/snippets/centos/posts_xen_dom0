@@ -1,0 +1,99 @@
+##
+# reinstall xen package
+##
+/usr/bin/yum reinstall -y xen
+
+
+##
+# services
+##
+/sbin/chkconfig xendomains on
+
+
+##
+# serial console redirection
+##
+#if $getVar('kernel_options', '') != ''
+/sbin/grubby --update-kernel=`/sbin/grubby --default-kernel` --remove-args="$kernel_options"
+#end if
+/bin/sed -i -e '/.*kernel \/xen\.gz-[0-9].*$/s/$/ console=com2,vga dom0_max_vcpus=1 dom0_vcpus_pin dom0_mem=512M/' /boot/grub/grub.conf
+/bin/sed -i -e '/.*module \/vmlinuz-[0-9].*el5xen.*$/s/$/ console=xvc xencons=xvc/' /boot/grub/grub.conf
+
+
+##
+# network virtual bridge
+##
+#set $is_bonding = False
+#set $bonding_iname = ''
+#set ikeys = $interfaces.keys()
+#for $iname in $ikeys
+#set $idata = $interfaces[$iname]
+#if $idata.get("interface_type", "") == "bond"
+#set $is_bonding = True
+#set $bonding_iname = $iname
+#end if
+#end for
+
+#if $is_bonding == True
+/usr/bin/patch /etc/xen/xend-config.sxp << EOF
+91c91,92
+< (network-script network-bridge)
+---
+> #(network-script network-bridge)
+> (network-script 'network-bridge bridge=xenbr0 netdev=$bonding_iname')
+EOF
+#else
+/usr/bin/patch /etc/xen/xend-config.sxp << EOF
+< (network-script network-bridge)
+---
+> #(network-script network-bridge)
+> (network-script 'network-bridge-custom')
+EOF
+
+
+# overwrite
+/bin/cat << EOF > /etc/xen/scripts/network-bridge-custom
+$SNIPPET('centos/xen-network-bridge-custom')
+EOF
+
+/bin/chmod 755 /etc/xen/scripts/network-bridge-custom
+#end if
+
+
+##
+# /etc/init.d/xendomains patch
+##
+/usr/bin/patch /etc/init.d/xendomains << EOF
+#raw
+162c162
+<     NM=$(xm create --quiet --dryrun --defconfig "$1" |
+---
+>     NM=$(xm create --quiet --dryrun --config "$1" |
+269c269
+<               XMC=`xm create --quiet --defconfig $dom`
+---
+>               XMC=`xm create --quiet --config $dom`
+#end raw
+EOF
+
+
+##
+# /etc/sysconfig/xendomains - disable auto saving and restore
+##
+/usr/bin/patch /etc/sysconfig/xendomains << EOF
+56c56
+< XENDOMAINS_SAVE=/var/lib/xen/save
+---
+> XENDOMAINS_SAVE=""
+89c89
+< XENDOMAINS_RESTORE=true
+---
+> XENDOMAINS_RESTORE=false
+EOF
+
+
+##
+# xendomains service start
+##
+/sbin/service xendomains start
+

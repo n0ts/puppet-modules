@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# activemq       Startup script for activemq.
+#/
+# chkconfig: - 99 01
+# description: activemq control script
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+NAME=`basename $0`
+ROOT_DIR=/usr/java
+USER=activemq
+FILESIZEBITS=`/usr/bin/getconf LONG_BIT`
+RETVAL=0
+
+[ -d "$ROOT_DIR" ] || exit 0
+
+export ACTIVEMQ_BASE=$ROOT_DIR/$NAME
+
+start() {
+  $ROOT_DIR/$NAME/bin/linux-x86-$FILESIZEBITS/$NAME status
+  RETVAL=$?
+  if [ $RETVAL -eq 0 ]; then
+    echo -n "$NAME is already running."
+    echo
+    return 1
+  fi
+
+  echo -n $"Starting $NAME: "
+
+  $ROOT_DIR/$NAME/bin/linux-x86-$FILESIZEBITS/$NAME start
+  RETVAL=$?
+  return $RETVAL
+}
+
+stop() {
+  echo -n $"Stopping $NAME: "
+  $ROOT_DIR/$NAME/bin/linux-x86-$FILESIZEBITS/$NAME stop
+  RETVAL=$?
+  return $RETVAL
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    stop
+    start
+    ;;
+  status)
+    $ROOT_DIR/$NAME/bin/linux-x86-$FILESIZEBITS/$NAME status
+    ;;
+  *)
+    echo "Usage: $NAME {start|stop|restart|status}"
+    exit 1
+  ;;
+esac
+
+exit $RETVAL

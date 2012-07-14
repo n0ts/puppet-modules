@@ -1,0 +1,10 @@
+#
+# snmp puppet module
+#
+
+This module snmp abstract.
+
+Usage:
+
+Variables:
+

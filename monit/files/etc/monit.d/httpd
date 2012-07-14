@@ -1,0 +1,9 @@
+#
+# httpd
+#
+
+check process httpd with pidfile /var/run/httpd/httpd.pid
+      start program = "/etc/init.d/httpd start"
+      stop program = "/etc/init.d/httpd stop"
+      if failed port 80 protocol http request "/"
+         for 3 cycles then restart

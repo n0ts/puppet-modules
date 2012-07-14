@@ -1,0 +1,19 @@
+##
+# yum
+##
+/bin/rm -f /etc/yum.repos.d/CentOS-*.repo
+
+#if $arch == "x86_64"
+#set $yum_exclude = "*.i386"
+#else
+#set $yum_exclude = ""
+#end if
+
+/usr/bin/patch /etc/yum.conf << EOF
+11a12
+> exclude=$yum_exclude
+15c16
+< metadata_expire=1h
+---
+> metadata_expire=0
+EOF

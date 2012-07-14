@@ -1,0 +1,8 @@
+#!/bin/sh
+exec 2>&1
+
+exec \
+  setuidgid USERNAME
+  env - PATH="/usr/local/bin:$PATH" \
+  envdir ./env \
+  /usr/local/bin/xxxd

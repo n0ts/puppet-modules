@@ -1,0 +1,17 @@
+#
+# puppetd
+#
+
+check process puppetd with pidfile /var/run/puppet/puppetd.pid
+      start program = "/etc/init.d/puppet start"
+      stop program = "/etc/init.d/puppet stop"
+
+check file puppet.sysconfig
+      with path /etc/sysconfig/puppet
+      if changed checksum
+          then exec "/etc/init.d/puppet reload"
+
+check file puppet.conf
+      with path /etc/puppet/puppet.conf
+      if changed checksum
+          then exec "/etc/init.d/puppet reload"
